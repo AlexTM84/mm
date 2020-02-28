@@ -39,7 +39,7 @@
                 </notification-widget>
 
                 <ol v-if="options.showBreadcrumb" class="breadcrumb">
-                    <li v-for="item in breadcrumb">
+                    <li v-for="item in breadcrumb" :key="item.path">
                         <a v-on:click.prevent="path=item.path" v-html="item.label" href="#"></a>
                     </li>
                 </ol>
@@ -94,7 +94,7 @@ export default {
     },
     data() {
         return {
-            path: this.$store.state.options.basePath,
+            path: this.$store.state.options.initialPath || this.$store.state.options.basePath,
             uploads: [],
             file: {},
             showUpload: true,
@@ -154,7 +154,6 @@ export default {
         isSelected(file) {
             return this.$store.getters.isSelected(file);
         },
-
         toggleUploadStatusOn() {
             if (this.hideUploadStatusTimeout)
                 window.clearTimeout(this.hideUploadStatusTimeout);

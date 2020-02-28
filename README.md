@@ -63,8 +63,8 @@ npm install vue-media-manager
 and
 
 ```
-import { MM } from 'vue-media-manager'
-require('vue-media-manager/dist/style.css')
+import { MM } from 'vue-media-manager-2'
+require('vue-media-manager-2/dist/style.css')
 require('font-awesome/css/font-awesome.css')
 require('bootstrap/dist/css/bootstrap.css')
 require('bootstrap/dist/js/bootstrap.js')

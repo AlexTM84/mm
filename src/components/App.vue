@@ -1,11 +1,9 @@
 <template>
-
     <div class="media-manager" v-bind:id="id">
 
         <div ref="mediaManager"></div>
 
     </div>
-
 </template>
 
 <script>
@@ -35,12 +33,19 @@ const defaultOptions = {
     showBreadcrumb: true,
     height: null,
     vue: Vue,
-    asVueComponenet: false
+    asVueComponent: false
 }
+
+let mm;
 
 export default {
     components: { MediaManager },
     props: [ 'id', 'opts'],
+    data() {
+        return {
+            store$: null
+        };
+    },
     created() {
         this.options = { ...defaultOptions, ...this.opts };
 
@@ -85,6 +90,12 @@ export default {
 
             if (this.options.onSelect)
                 this.options.onSelect(e);
+        },
+        select(file) {
+            this.store$.commit('addSelected', file);
+        },
+        deselect(file) {
+            this.store$.commit('removeSelected', file);
         }
     },
     mounted() {
@@ -92,7 +103,8 @@ export default {
             this.options.onMounted({ el: this.$el, vc: this });
 
         const store = new Vuex.Store(Store.create(this, this.options));
-        
+        this.store$ = store;
+
         var mediaManager = this.$refs.mediaManager
 
         new Vue({

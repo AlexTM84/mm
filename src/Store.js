@@ -7,10 +7,16 @@ export default class Store {
         if (selected) {
             if (Array.isArray(selected)) {
                 selected = selected.map(function(e){
-                    return { path: e };
+                    if(typeof e === "string") {
+                        return { path: e };
+                    } else {
+                        return e;
+                    }
                 });
             } else {
-                selected = { path: selected };
+                if(typeof selected === "string") {
+                    selected = { path: selected };
+                }
             }
         }
 
@@ -37,17 +43,20 @@ export default class Store {
                     } else {
                         state.selected = file;
                     }
+                    state.selected = JSON.parse(JSON.stringify(state.selected));
                     state.mm.onSelect({ selected: state.selected });
                 },
                 removeSelected(state, file) {
                     if (state.options.multipleSelection) {
                         if (!Array.isArray(state.selected)) return;
                         let index = state.selected.findIndex(element => { return element.path === file.path; });
-                        if (index>-1)
+                        if (index>-1) {
                             state.selected.splice(index, 1);
+                        }
                     } else {
                         state.selected = null;
                     }
+                    state.selected = JSON.parse(JSON.stringify(state.selected));
                     state.mm.onSelect({ selected: state.selected });
                 }
             },
@@ -56,7 +65,9 @@ export default class Store {
                     //if (!state.options.input) return false;
                     if (state.options.multipleSelection) {
                         if (!Array.isArray(state.selected)) return;
-                        let index = state.selected.findIndex(element => { return element.path === file.path; });
+                        let index = state.selected.findIndex(element => {
+                            return element.path === file.path; 
+                        });
                         return index > -1;
                     } else {
                         return (state.selected && state.selected.path === file.path);

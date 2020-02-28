@@ -1,21 +1,26 @@
 {
-  "name": "vue-media-manager",
-  "description": "Media Manager",
-  "version": "0.0.3",
+  "name": "vue-media-manager-2",
+  "description": "Media Manager 2",
+  "version": "0.0.4",
   "author": "Kevin LEVRON <kevin.levron@univ-pau.fr>",
   "contributors": [
     {
       "name": "Julien Croain"
+    },
+    {
+      "name": "Alessandro Cosci"
     }
   ],
   "private": false,
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JulienCroain/mm.git"
+    "url": "https://github.com/AlexTM84/mm.git"
   },
   "main": "dist/mm.min.js",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"

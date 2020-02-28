@@ -1,6 +1,6 @@
 <template>
 
-    <div class="file" v-bind:class="{ selected: mmc.isSelected(file) }">
+    <div class="file" v-bind:class="{ selected: selected }">
 
         <div class="file-preview">
 
@@ -46,6 +46,9 @@ export default {
     computed: {
         mmc() {
             return this.$parent.$parent;
+        },
+        selected() {
+            return this.mmc.isSelected(this.file);
         }
     },
     methods: {
