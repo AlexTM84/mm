@@ -33,7 +33,8 @@ const defaultOptions = {
     showBreadcrumb: true,
     height: null,
     vue: Vue,
-    asVueComponent: false
+    asVueComponent: false,
+    accept: ""
 }
 
 let mm;

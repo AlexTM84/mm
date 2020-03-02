@@ -45,6 +45,7 @@
                         v-bind:file="file"
                         v-bind:key="file.path"
                         class="animated fadeIn"
+                        v-bind:class="{ invalid: file.type !== 'dir' && !mmc.checkFile(file) }"
                     ></media-widget>
 
                 </template>
@@ -121,6 +122,16 @@ export default {
     },
     mounted() {
         this.refresh();
+
+        this.$on("fileDeleted", file => {
+            var pos = this.files.indexOf(file);
+            if(pos !== -1) {
+                this.files.splice(pos, 1);
+            }
+        });
+    },
+    destroyed() {
+        this.$off("fileDeleted");
     },
     methods: {
         refresh() {
@@ -157,7 +168,9 @@ export default {
                 if (mmc.isSelected(file)) {
                     mmc.unselectFile(file);
                 } else {
-                    mmc.selectFile(file);
+                    if(mmc.checkFile(file)) {
+                        mmc.selectFile(file);
+                    }
                 }
             }
         },

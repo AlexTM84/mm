@@ -22,18 +22,20 @@
 
         </div>
 
-        <!--<div v-if="file.type!='dir'" class="file-actions">-->
+        <!-- <div v-if="file.type!='dir'" class="file-actions">-->
         <!--    <div class="btn-group btn-group-xs" role="group">-->
         <!--        <button v-if="isSelected" v-on:click.stop="onUnselect" class="btn btn-default"><i class="fa fa-fw fa-check-square-o"></i></button>-->
         <!--        <button v-else v-on:click.stop="onSelect" class="btn btn-default"><i class="fa fa-fw fa-square-o"></i></button>-->
         <!--        <button class="btn btn-default"><i class="fa fa-fw fa-search-plus"></i></button>-->
         <!--    </div>-->
-        <!--</div>-->
+        <!-- </div>-->
 
         <div class="file-title">
             <h3>{{ file.basename }}</h3>
         </div>
-
+        <div class="top right actions" v-if="canDelete">
+            <button class="btn btn-default" @click.stop="deleteFile(file)"><i class="fa fa-fw fa-trash"></i></button>
+        </div>
     </div>
 
 </template>
@@ -49,9 +51,15 @@ export default {
         },
         selected() {
             return this.mmc.isSelected(this.file);
+        },
+        canDelete() {
+            return this.mmc.options.api.deleteUrl;
         }
     },
     methods: {
+        deleteFile(file) {
+            this.mmc.deleteFile(file);
+        }
     }
 };
 </script>
@@ -68,6 +76,8 @@ $fileHeight: $filePreviewHeight + $fileTitleHeight;
 $fileBorderColor: #eee;
 $fileBorderColorH: #333;
 
+$actionsRadius: 5px;
+
 .file {
     position: relative;
     float: left;
@@ -77,6 +87,55 @@ $fileBorderColorH: #333;
     border: $fileBorderWidth solid $fileBorderColor;
     transition: border-color 0.4s;
     overflow: hidden;
+
+    &.invalid {
+        opacity: 0.4;
+        cursor: default;
+    }
+
+    .actions {
+        position: absolute;
+        background-color: white;
+        background-color: rgba(255, 255, 255, 0.5);
+        padding: 5px;
+
+        button {
+            outline: none;
+            cursor: pointer;
+        }
+    }
+
+    .top {
+        top: 0;
+
+        &.right {
+            border-bottom-left-radius: $actionsRadius;
+        }
+
+        &.left {
+            border-bottom-right-radius: $actionsRadius;
+        }
+    }
+
+    .bottom {
+        bottom: 0;
+
+        &.right {
+            border-top-left-radius: $actionsRadius;
+        }
+
+        &.left {
+            border-top-right-radius: $actionsRadius;
+        }
+    }
+
+    .left {
+        left: 0;
+    }
+
+    .right {
+        right: 0;
+    }
 }
 
 .file-preview {

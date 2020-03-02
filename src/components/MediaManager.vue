@@ -130,7 +130,6 @@ export default {
     created() {
     },
     methods: {
-
         onUploadSuccess() {
             this.hideUploadStatus();
             this.$refs.medias.refresh();
@@ -139,12 +138,10 @@ export default {
             this.hideUploadStatus();
             this.$refs.medias.refresh();
         },
-
         onDetailsClose() {
             this.showDetails = false;
             this.file = {};
         },
-
         selectFile(file) {
             this.$store.commit('addSelected', file);
         },
@@ -153,6 +150,28 @@ export default {
         },
         isSelected(file) {
             return this.$store.getters.isSelected(file);
+        },
+        deleteFile(file) {
+            let confirmation;
+            if(this.options.api.deleteUrl) {
+                if(typeof this.options.confirmDeletion === "function") {
+                    confirmation = this.options.confirmDeletion(file);
+                } else {
+                    if(window.confirm("Are you sure to remove file " + file.basename + "?")) {
+                        confirmation = Promise.resolve();
+                    } else {
+                        confirmation = Promise.reject();
+                    }
+                }
+                confirmation.then(() => {
+                    this.api.delete(file).then(() => {
+                        this.$store.commit('removeSelected', file);
+                        this.$refs.medias.$emit("fileDeleted", file);
+                    }, e => {
+                        console.error(e);
+                    });
+                }, () => {});
+            }
         },
         toggleUploadStatusOn() {
             if (this.hideUploadStatusTimeout)
@@ -167,12 +186,10 @@ export default {
         hideUploadStatus() {
             this.hideUploadStatusTimeout = window.setTimeout(this.toggleUploadStatusOff, 5000);
         },
-
         toggleUpload() {
             this.showUpload = !this.showUpload;
             this.showMedias = !this.showUpload;
         },
-
         toggleDetailsOn(file) {
             this.file = file;
             this.showDetails = true;
@@ -181,7 +198,29 @@ export default {
             this.file = {};
             this.showDetails = false;
         },
+        checkFile(file) {
+            if(!this.options.accept) {
+                return true;
+            } else if(typeof this.options.accept === "function") {
+                return this.options.accept(file);
+            } else {
+                var types = [];
+                if(typeof this.options.accept === "string") {
+                    types = [this.options.accept];
+                } else if (Array.isArray(this.options.accept)) {
+                    types = this.options.accept;
+                }
+                for(var t in types) {
+                    var type = types[t];
+                    var re = new RegExp("^" + type.replace("*", ".*").replace("/", "\\/") + "$", "i");
+                    if(re.test(file.mime)) {
+                        return true;
+                    }
+                }
 
+                return false;
+            }
+        },
         /**
          * FA icon class helper
          */
