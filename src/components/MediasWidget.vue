@@ -38,7 +38,7 @@
                         </div>
                     </div>
 
-                    <div v-if="canCreateFolder" v-on:click="createFolder()" class="file animated fadeIn">
+                    <div v-if="canCreateFolder && !loading" v-on:click="createFolder()" class="file animated fadeIn">
                         <div class="file-preview">
                             <div class="icon">
                                 <i class="fas fa-fw fa-folder-plus"></i>

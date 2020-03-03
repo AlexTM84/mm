@@ -15,6 +15,7 @@
                     v-on:drop.prevent="onDrop"
                     v-on:submit.prevent="onSubmit"
                     class="animated fadeIn"
+                    ref="form"
                 >
                     <svg class="upload-widget-icon" xmlns="http://www.w3.org/2000/svg" width="50" height="43" viewBox="0 0 50 43"><path d="M48.4 26.5c-.9 0-1.7.7-1.7 1.7v11.6h-43.3v-11.6c0-.9-.7-1.7-1.7-1.7s-1.7.7-1.7 1.7v13.2c0 .9.7 1.7 1.7 1.7h46.7c.9 0 1.7-.7 1.7-1.7v-13.2c0-1-.7-1.7-1.7-1.7zm-24.5 6.1c.3.3.8.5 1.2.5.4 0 .9-.2 1.2-.5l10-11.6c.7-.7.7-1.7 0-2.4s-1.7-.7-2.4 0l-7.1 8.3v-25.3c0-.9-.7-1.7-1.7-1.7s-1.7.7-1.7 1.7v25.3l-7.1-8.3c-.7-.7-1.7-.7-2.4 0s-.7 1.7 0 2.4l10 11.6z"/></svg>
                     <label v-bind:for="fileInputId"><strong>Scegli un file</strong>&nbsp;<span>o trascinalo qui</span>.</label>
@@ -97,6 +98,7 @@ export default {
             if (this.$refs.fileInput.files) {
                 this.files = this.$refs.fileInput.files;
                 this.submit();
+                this.$refs.form.reset();
             }
         },
         /**
@@ -117,7 +119,7 @@ export default {
                 let upload = { name: file.name, type: file.type, loaded: 0, total: Math.max(100, file.size), success: false, error: false };
                 this.mmc.uploads.push(upload);
                 if (file.type) {
-                    requests.push(this.buildRequest(file));
+                    requests.push(this.buildRequest(file, upload));
                 } else {
                     upload.loaded = upload.total;
                     upload.error = 'Invalid file.';
@@ -140,19 +142,26 @@ export default {
         /**
          * build axios request
          */
-        buildRequest(file) {
+        buildRequest(file, upload) {
+            if(file.type.indexOf("image/") != -1) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    upload.thumb = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+
             let formData = new FormData();
             formData.append('path', this.path);
             formData.append('file', file);
 
             return this.api.upload(formData, {
                 onUploadProgress: progressEvent => {
-                   let upload = this.mmc.uploads[file.index];
                    upload.loaded = progressEvent.loaded;
                    upload.total = progressEvent.total;
                 }
-            }).then(response => {
-                this.mmc.uploads[file.index].success = true;
+            }, upload).then(response => {
+                upload.success = true;
             }, error => {
                 if (error.response && error.response.data && Array.isArray(error.response.data)) {
                     let errors = error.response.data, message = '';
@@ -161,10 +170,10 @@ export default {
                         if (errors[i].message)
                             message+= errors[i].message;
                     }
-                    this.mmc.uploads[file.index].error = message;
+                    upload.error = message;
                 } else {
                     this.errors.push({ message: error });
-                    this.mmc.uploads[file.index].error = error;
+                    upload.error = error;
                 }
             });
         }

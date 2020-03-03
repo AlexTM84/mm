@@ -8,7 +8,9 @@ export default class Api {
             listUrl: null,
             downloadUrl: null,
             deleteUrl: null,
+            createFolderUrl: null,
             uploadUrl: null,
+            beforeUpload: null,
             axiosOptions: {}
         };
     }
@@ -28,9 +30,26 @@ export default class Api {
         return this.axios.get(this.options.listUrl, conf);
     }
 
-    upload(data, config) {
+    upload(data, config, uploadFile) {
         var conf = this.computeConfig(config);
-        return this.axios.post(this.options.uploadUrl, data, conf);
+        var options = {
+            config: conf,
+            url: this.options.uploadUrl
+        };
+        let configured = Promise.resolve();
+        if(this.options.beforeUpload instanceof Function) {
+            configured = Promise.all([this.options.beforeUpload(options, data, uploadFile)]).then(a => a[0]);
+        }
+
+        return configured.then(() => {
+            return this.axios.post(options.url, data, options.config).then(res => {
+                if(this.options.afterUpload instanceof Function) {
+                    return this.options.afterUpload(res, options, uploadFile);
+                } else {
+                    return res;
+                }
+            });
+        });
     }
 
     delete(file) {
