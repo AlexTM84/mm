@@ -186,7 +186,7 @@ export default {
             }
             return Promise.all([name]).then(([name]) => {
                 return this.api.createFolderIn(parentFolder, name);
-            }, {});
+            });
         },
         toggleUploadStatusOn() {
             if (this.hideUploadStatusTimeout)

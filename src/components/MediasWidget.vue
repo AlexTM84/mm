@@ -148,7 +148,7 @@ export default {
         createFolder() {
             this.mmc.createFolderIn(this.path).then(() => {
                 this.refresh();
-            });
+            }, () => {});
         },
         refresh() {
             this.loading = true;
