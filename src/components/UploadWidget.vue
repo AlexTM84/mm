@@ -116,7 +116,7 @@ export default {
             for (let i=0;i<this.files.length;i++) {
                 let file = this.files[i];
                 file.index = i;
-                let upload = { name: file.name, type: file.type, loaded: 0, total: Math.max(100, file.size), success: false, error: false };
+                let upload = { name: file.name, type: file.type, loaded: 0, total: Math.max(100, file.size), success: false, error: false, path: this.path };
                 this.mmc.uploads.push(upload);
                 if (file.type) {
                     requests.push(this.buildRequest(file, upload));

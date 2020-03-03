@@ -43,6 +43,7 @@
                         <a v-on:click.prevent="path=item.path" v-html="item.label" href="#"></a>
                     </li>
                 </ol>
+
                 <div class="mm-content">
 
                     <upload-widget
@@ -251,6 +252,20 @@ export default {
     position: relative;
     .animated {
       animation-duration: 0.4s;
+    }
+
+    .breadcrumb {
+        padding-left: 0;
+        margin-bottom: 0.5em;
+        li {
+            display: inline-block;
+
+            &:not(:last-child)::after {
+                display: inline-block;
+                padding: 0 0.5em;
+                content: ">";
+            }
+        }
     }
 }
 

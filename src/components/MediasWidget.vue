@@ -22,7 +22,7 @@
                     <div class="file animated fadeIn">
                         <div class="file-preview">
                             <div class="icon">
-                                <i class="fa fa-fw fa-spin fa-refresh"></i>
+                                <i class="fa fa-fw fa-spin fa-sync"></i>
                             </div>
                         </div>
                     </div>

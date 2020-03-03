@@ -151,7 +151,7 @@ $actionsRadius: 5px;
         text-align: center;
         line-height: $filePreviewIconHeight;
         font-size: ($filePreviewIconHeight) / 1.3;
-        .fa {
+        .fa, .fas, .fad {
             vertical-align: middle;
         }
     }
