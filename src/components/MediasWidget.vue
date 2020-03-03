@@ -38,6 +38,14 @@
                         </div>
                     </div>
 
+                    <div v-if="canCreateFolder" v-on:click="createFolder()" class="file animated fadeIn">
+                        <div class="file-preview">
+                            <div class="icon">
+                                <i class="fas fa-fw fa-folder-plus"></i>
+                            </div>
+                        </div>
+                    </div>
+
                     <media-widget
                         v-for="file in files"
                         v-on:click.native="onMediaClick(file)"
@@ -104,6 +112,9 @@ export default {
         relPath() {
             return this.path.replace(this.basePath, '');
         },
+        canCreateFolder() {
+            return this.mmc.options.api.createFolderUrl;
+        },
         pathUp() {
             let path = '', index = this.relPath.lastIndexOf('/');
             if (index>-1) {
@@ -134,6 +145,11 @@ export default {
         this.$off("fileDeleted");
     },
     methods: {
+        createFolder() {
+            this.mmc.createFolderIn(this.path).then(() => {
+                this.refresh();
+            });
+        },
         refresh() {
             this.loading = true;
             this.error = false;

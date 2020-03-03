@@ -152,9 +152,9 @@ export default {
             return this.$store.getters.isSelected(file);
         },
         deleteFile(file) {
-            let confirmation;
             if(this.options.api.deleteUrl) {
-                if(typeof this.options.confirmDeletion === "function") {
+                let confirmation;
+                if(this.options.confirmDeletion instanceof Function) {
                     confirmation = this.options.confirmDeletion(file);
                 } else {
                     if(window.confirm("Are you sure to remove file " + file.basename + "?")) {
@@ -168,10 +168,25 @@ export default {
                         this.$store.commit('removeSelected', file);
                         this.$refs.medias.$emit("fileDeleted", file);
                     }, e => {
-                        console.error(e);
+                        if(this.options.onError instanceof Function) {
+                            this.options.onError(e, "delete", file);
+                        }
                     });
                 }, () => {});
             }
+        },
+        createFolderIn(parentFolder) {
+            let name;
+            if(this.options.api.createFolderUrl) {
+                if(this.options.askFolderName instanceof Function) {
+                    name = this.options.askFolderName(parentFolder);
+                } else if(!(name = window.prompt("Type the name of the new folder"))) {
+                    name = Promise.reject();
+                }
+            }
+            return Promise.all([name]).then(([name]) => {
+                return this.api.createFolderIn(parentFolder, name);
+            }, {});
         },
         toggleUploadStatusOn() {
             if (this.hideUploadStatusTimeout)
@@ -201,7 +216,7 @@ export default {
         checkFile(file) {
             if(!this.options.accept) {
                 return true;
-            } else if(typeof this.options.accept === "function") {
+            } else if(this.options.accept instanceof Function) {
                 return this.options.accept(file);
             } else {
                 var types = [];

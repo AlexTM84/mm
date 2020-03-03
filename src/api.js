@@ -38,6 +38,11 @@ export default class Api {
         return this.axios.delete(this.deleteUrl(file), conf);
     }
 
+    createFolderIn(parentFolder, name) {
+        var conf = this.computeConfig({});
+        return this.axios.post(this.createFolderUrl(parentFolder, name), {}, conf);
+    }
+
     computeConfig(conf) {
         if (!this.options.requestConfig) {
             return conf
@@ -58,6 +63,11 @@ export default class Api {
     deleteUrl(file) {
         if (this.options.deleteUrl)
             return this.options.deleteUrl+'/'+file.path;
+    }
+
+    createFolderUrl(parentFolder, name) {
+        if (this.options.createFolderUrl)
+            return this.options.createFolderUrl + (parentFolder ? '/' + parentFolder : "") + '/' + name;
     }
 
 }

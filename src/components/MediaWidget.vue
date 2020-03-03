@@ -89,8 +89,11 @@ $actionsRadius: 5px;
     overflow: hidden;
 
     &.invalid {
-        opacity: 0.4;
         cursor: default;
+        
+        .file-preview, .file-title {
+            opacity: 0.2;
+        }
     }
 
     .actions {
