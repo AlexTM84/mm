@@ -11,14 +11,14 @@
             ></details-widget>
         </transition>
 
-        <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+        <!-- <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
             <upload-status-widget
                 v-if="showUploadStatus"
                 v-bind:uploads="uploads"
                 ref="details"
                 key="details"
             ></upload-status-widget>
-        </transition>
+        </transition> -->
 
         <div class="panel panel-default">
 
@@ -58,7 +58,8 @@
                     ></upload-widget>
 
                     <medias-widget
-                        v-bind:path="path"
+                        :path="path"
+                        :uploads="uploadsInPath"
                         v-show="showMedias"
                         ref="medias"
                         key="medias"
@@ -126,6 +127,11 @@ export default {
             }
 
             return breadcrumb;
+        },
+        uploadsInPath() {
+            return this.uploads.filter(item => {
+                return item.path == this.path;
+            });
         }
     },
     created() {

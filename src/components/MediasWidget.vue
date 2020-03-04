@@ -56,6 +56,12 @@
                         v-bind:class="{ invalid: file.type !== 'dir' && !mmc.checkFile(file) }"
                     ></media-widget>
 
+                    <media-upload-widget
+                        v-for="(upload, idx) in uploads"
+                        :key="idx"
+                        :file="upload"
+                    ></media-upload-widget>
+
                 </template>
             </div>
 
@@ -84,9 +90,13 @@
 /* global $ */
 import { mapState } from 'vuex';
 import MediaWidget from './MediaWidget.vue';
+import MediaUploadWidget from './MediaUploadWidget.vue';
 
 export default {
-    components: { MediaWidget },
+    components: {
+        MediaWidget,
+        MediaUploadWidget
+    },
     data() {
         return {
             files: [],
@@ -98,7 +108,10 @@ export default {
             showContextMenu: false
         };
     },
-    props: [ 'path' ],
+    props: [
+        'path',
+        'uploads'
+    ],
     computed: {
         ...mapState({
             basePath: state => state.options.basePath

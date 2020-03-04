@@ -116,7 +116,15 @@ export default {
             for (let i=0;i<this.files.length;i++) {
                 let file = this.files[i];
                 file.index = i;
-                let upload = { name: file.name, type: file.type, loaded: 0, total: Math.max(100, file.size), success: false, error: false, path: this.path };
+                let upload = {
+                    name: file.name,
+                    type: file.type,
+                    loaded: 0,
+                    total: Math.max(100, file.size),
+                    success: false,
+                    error: false,
+                    path: this.path
+                };
                 this.mmc.uploads.push(upload);
                 if (file.type) {
                     requests.push(this.buildRequest(file, upload));
@@ -162,6 +170,9 @@ export default {
                 }
             }, upload).then(response => {
                 upload.success = true;
+
+                // Remove it
+                this.mmc.uploads.splice(this.mmc.uploads.indexOf(upload), 1);
             }, error => {
                 if (error.response && error.response.data && Array.isArray(error.response.data)) {
                     let errors = error.response.data, message = '';

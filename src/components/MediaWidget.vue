@@ -30,7 +30,7 @@
         <!--    </div>-->
         <!-- </div>-->
 
-        <div class="file-title">
+        <div class="file-title" :title="file.basename">
             <h3>{{ file.basename }}</h3>
         </div>
         <div class="top right actions" v-if="canDelete">
