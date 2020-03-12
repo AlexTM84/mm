@@ -1,6 +1,7 @@
 import 'es6-promise/auto';
 import Vue from 'vue';
 import App from './components/App.vue';
+// import MediaWidget from './components/MediaWidget';
 
 /**
  * Media Manager
@@ -8,7 +9,8 @@ import App from './components/App.vue';
 export class MM {
 
     static install (vue, options) {
-        vue.component('vue-media-manager', App)
+        vue.component('VueMediaManager', App)
+        // vue.component('MediaWidget', MediaWidget)
     }
 
     constructor(opts) {
