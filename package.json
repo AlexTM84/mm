@@ -1,7 +1,7 @@
 {
   "name": "vue-media-manager-2",
   "description": "Media Manager 2",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Kevin LEVRON <kevin.levron@univ-pau.fr>",
   "contributors": [
     {
@@ -26,10 +26,10 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
-    "vue": "^2.2.4",
-    "vuex": "^3.0.1",
+    "axios": "^0.19.2",
     "es6-promise": "^4.1.1",
-    "axios": "^0.15.3"
+    "vue": "^2.2.4",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
