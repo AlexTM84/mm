@@ -33,8 +33,13 @@
         <div class="file-title">
             <h3>{{ file.basename }}</h3>
         </div>
+
         <div class="top right actions" v-if="canDelete">
             <button class="btn btn-default" @click.stop="deleteFile(file)"><i class="fa fa-fw fa-trash"></i></button>
+        </div>
+
+        <div class="top left actions" v-if="canRename">
+            <button class="btn btn-default" @click.stop="renameFile(file)"><i class="fa fa-fw fa-pencil"></i></button>
         </div>
     </div>
 
@@ -54,11 +59,17 @@ export default {
         },
         canDelete() {
             return this.mmc.options.api.deleteUrl;
+        },
+        canRename() {
+            return this.mmc.options.api.renameUrl;
         }
     },
     methods: {
         deleteFile(file) {
             this.mmc.deleteFile(file);
+        },
+        renameFile(file) {
+            this.mmc.renameFile(file);
         }
     }
 };
@@ -90,7 +101,7 @@ $actionsRadius: 5px;
 
     &.invalid {
         cursor: default;
-        
+
         .file-preview, .file-title {
             opacity: 0.2;
         }

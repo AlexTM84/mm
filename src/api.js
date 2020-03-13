@@ -2,91 +2,99 @@ import axios from 'axios';
 
 export default class Api {
 
-    static get defaultOptions() {
-        return {
-            baseUrl: null,
-            listUrl: null,
-            downloadUrl: null,
-            deleteUrl: null,
-            createFolderUrl: null,
-            uploadUrl: null,
-            beforeUpload: null,
-            axiosOptions: {}
-        };
+  static get defaultOptions() {
+    return {
+      baseUrl: null,
+      listUrl: null,
+      downloadUrl: null,
+      deleteUrl: null,
+      renameUrl: null,
+      createFolderUrl: null,
+      uploadUrl: null,
+      beforeUpload: null,
+      axiosOptions: {}
+    };
+  }
+
+  constructor(opts) {
+    this.options = { ...this.constructor.defaultOptions, ...opts };
+
+    if (this.options.baseUrl) {
+      this.options.axiosOptions.baseURL = this.options.baseUrl;
     }
 
-    constructor(opts) {
-        this.options = { ...this.constructor.defaultOptions, ...opts};
+    this.axios = axios.create(this.options.axiosOptions);
+  }
 
-        if (this.options.baseUrl) {
-            this.options.axiosOptions.baseURL = this.options.baseUrl;
+  list(path) {
+    var conf = this.computeConfig({ params: { path: path } });
+    return this.axios.get(this.options.listUrl, conf);
+  }
+
+  upload(data, config, uploadFile) {
+    var conf = this.computeConfig(config);
+    var options = {
+      config: conf,
+      url: this.options.uploadUrl
+    };
+    let configured = Promise.resolve();
+    if (this.options.beforeUpload instanceof Function) {
+      configured = Promise.all([this.options.beforeUpload(options, data, uploadFile)]).then(a => a[0]);
+    }
+
+    return configured.then(() => {
+      return this.axios.post(options.url, data, options.config).then(res => {
+        if (this.options.afterUpload instanceof Function) {
+          return this.options.afterUpload(res, options, uploadFile);
+        } else {
+          return res;
         }
+      });
+    });
+  }
 
-        this.axios = axios.create(this.options.axiosOptions);
-    }
+  delete(file) {
+    var conf = this.computeConfig({});
+    return this.axios.delete(this.deleteUrl(file), conf);
+  }
 
-    list(path) {
-        var conf = this.computeConfig({ params: { path: path } });
-        return this.axios.get(this.options.listUrl, conf);
-    }
+  rename(file, name) {
+    var conf = this.computeConfig({});
+    return this.axios.patch(this.renameUrl(file), {
+      name: name
+    }, conf);
+  }
 
-    upload(data, config, uploadFile) {
-        var conf = this.computeConfig(config);
-        var options = {
-            config: conf,
-            url: this.options.uploadUrl
-        };
-        let configured = Promise.resolve();
-        if(this.options.beforeUpload instanceof Function) {
-            configured = Promise.all([this.options.beforeUpload(options, data, uploadFile)]).then(a => a[0]);
-        }
+  createFolderIn(parentFolder, name) {
+    var conf = this.computeConfig({});
+    return this.axios.post(this.createFolderUrl(parentFolder, name), {}, conf);
+  }
 
-        return configured.then(() => {
-            return this.axios.post(options.url, data, options.config).then(res => {
-                if(this.options.afterUpload instanceof Function) {
-                    return this.options.afterUpload(res, options, uploadFile);
-                } else {
-                    return res;
-                }
-            });
-        });
+  computeConfig(conf) {
+    if (!this.options.requestConfig) {
+      return conf
     }
+    var overrideConf = this.options.requestConfig
+    if (overrideConf instanceof Function) {
+      overrideConf = overrideConf()
+    }
+    return { ...conf, ...overrideConf }
+  }
 
-    delete(file) {
-        var conf = this.computeConfig({});
-        return this.axios.delete(this.deleteUrl(file), conf);
-    }
+  downloadUrl(file) {
+    return this.options.downloadUrl && this.options.downloadUrl + '?path=' + file.path;
+  }
 
-    createFolderIn(parentFolder, name) {
-        var conf = this.computeConfig({});
-        return this.axios.post(this.createFolderUrl(parentFolder, name), {}, conf);
-    }
+  deleteUrl(file) {
+    return this.options.deleteUrl && this.options.deleteUrl + '/' + file.path;
+  }
 
-    computeConfig(conf) {
-        if (!this.options.requestConfig) {
-            return conf
-        }
-        var overrideConf = this.options.requestConfig
-        if (overrideConf instanceof Function) {
-            overrideConf = overrideConf()
-        }
-        return { ...conf, ...overrideConf }
-    }
+  renameUrl(file) {
+    return this.options.renameUrl && this.options.deleteUrl + '/' + file.path;
+  }
 
-    downloadUrl(file) {
-        // TODO : proper
-        if (this.options.downloadUrl)
-            return this.options.downloadUrl+'?path='+file.path;
-    }
-    
-    deleteUrl(file) {
-        if (this.options.deleteUrl)
-            return this.options.deleteUrl+'/'+file.path;
-    }
-
-    createFolderUrl(parentFolder, name) {
-        if (this.options.createFolderUrl)
-            return this.options.createFolderUrl + (parentFolder ? '/' + parentFolder : "") + '/' + name;
-    }
+  createFolderUrl(parentFolder, name) {
+    return this.options.createFolderUrl && this.options.createFolderUrl + (parentFolder ? '/' + parentFolder : "") + '/' + name;
+  }
 
 }

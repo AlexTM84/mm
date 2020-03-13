@@ -140,9 +140,14 @@ export default {
                 this.files.splice(pos, 1);
             }
         });
+
+        this.$on("fileRenamed", (file, newFile) => {
+            Object.assign(file, newFile);
+        });
     },
     destroyed() {
         this.$off("fileDeleted");
+        this.$off("fileRenamed");
     },
     methods: {
         createFolder() {
@@ -153,7 +158,7 @@ export default {
         refresh() {
             this.loading = true;
             this.error = false;
-            
+
             this.api.list(this.path)
                 .then(response => {
                     if (Array.isArray(response.data)) {
