@@ -12,6 +12,7 @@ import Vuex from 'vuex';
 import MediaManager from './MediaManager.vue';
 import Api from '../api.js';
 import Store from '../Store'
+import globalStore from "../GlobalStore";
 
 Vue.use(Vuex);
 
@@ -97,6 +98,9 @@ export default {
         },
         deselect(file) {
             this.store$.commit('removeSelected', file);
+        },
+        globalStore() {
+          return globalStore;
         }
     },
     mounted() {

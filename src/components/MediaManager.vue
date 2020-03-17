@@ -39,12 +39,14 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters, mapMutations } from "vuex";
 
 import UploadWidget from "./UploadWidget.vue";
 import MediasWidget from "./MediasWidget.vue";
 import NotificationWidget from "./NotificationWidget.vue";
 import FaIconClassHelper from "../FaIconClassHelper";
+
+import globalStore from "../GlobalStore";
 
 export default {
   props: ["api", "id"],
@@ -58,7 +60,6 @@ export default {
       path:
         this.$store.state.options.initialPath ||
         this.$store.state.options.basePath,
-      uploads: [],
       file: {}
     };
   },
@@ -92,19 +93,11 @@ export default {
       return breadcrumb;
     },
     uploadsInPath() {
-      return this.uploads.filter(item => {
-        return item.path == this.path;
-      });
+      return globalStore.getters.uploading(this.path);
     }
   },
   created() {},
   methods: {
-    onUploadSuccess() {
-      this.$refs.medias.refresh();
-    },
-    onUploadError(errors) {
-      this.$refs.medias.refresh();
-    },
     selectFile(file) {
       this.$store.commit("addSelected", file);
     },
@@ -113,6 +106,12 @@ export default {
     },
     isSelected(file) {
       return this.$store.getters.isSelected(file);
+    },
+    onUploadSuccess() {
+      this.$refs.medias.refresh();
+    },
+    onUploadError(errors) {
+      //this.$refs.medias.refresh();
     },
     deleteFile(file) {
       if (this.options.api.deleteUrl) {
@@ -220,6 +219,15 @@ export default {
 
         return false;
       }
+    },
+    removeUpload(file) {
+      return globalStore.dispatch("removeUpload", file);
+    },
+    startUpload(file) {
+      return globalStore.dispatch("startUpload", file);
+    },
+    updateUpload(file, info) {
+      return globalStore.dispatch("updateUpload", { file, info });
     },
     /**
      * FA icon class helper

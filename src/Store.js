@@ -37,7 +37,7 @@ export default class Store {
             if (!Array.isArray(state.selected)) {
               state.selected = [];
             } else {
-              let index = state.selected.findIndex(element => { return element.path === file.path; });
+              let index = state.selected.findIndex(element => { return (file.path && element.path === file.path) || (file.uuid && element.uuid === file.uuid); });
               if (index > -1) return;
             }
             state.selected.push(file);
@@ -50,7 +50,7 @@ export default class Store {
         removeSelected(state, file) {
           if (state.options.multipleSelection) {
             if (!Array.isArray(state.selected)) return;
-            let index = state.selected.findIndex(element => { return element.path === file.path; });
+            let index = state.selected.findIndex(element => { return (file.path && element.path === file.path) || (file.uuid && element.uuid === file.uuid); });
             if (index > -1) {
               state.selected.splice(index, 1);
             }
@@ -114,11 +114,11 @@ export default class Store {
           if (state.options.multipleSelection) {
             if (!Array.isArray(state.selected)) return false;
             let index = state.selected.findIndex(element => {
-              return element.path === file.path;
+              return (file.path && element.path === file.path) || (file.uuid && element.uuid === file.uuid);
             });
             return index > -1;
           } else {
-            return (state.selected && state.selected.path === file.path) || false;
+            return state.selected && ((file.path && state.selected.path === file.path) || (file.uuid && state.selected.uuid === file.uuid)) || false;
           }
         },
         nbSelected: (state, getters) => {

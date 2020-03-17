@@ -60,7 +60,7 @@
                         v-for="upload in uploads"
                         v-on:click.native="onMediaClick(upload)"
                         v-bind:file="upload"
-                        v-bind:key="upload.path"
+                        v-bind:key="upload.uuid"
                         class="animated fadeIn"
                     ></media-widget>
 

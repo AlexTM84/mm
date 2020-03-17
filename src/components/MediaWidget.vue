@@ -1,7 +1,7 @@
 <template>
-  <div class="file" v-bind:class="{ selected: selected }">
+  <div class="file" v-bind:class="{ selected: selected, interrupted: file.error }">
     <div class="file-preview">
-      <template v-if="file.thumb">
+      <template v-if="file.thumb && !file.error">
         <img v-bind:src="file.thumb" class="thumb" />
       </template>
 
@@ -11,9 +11,15 @@
         </div>
       </template>
 
-      <template v-else>
+      <template v-else-if="!file.error">
         <div class="icon">
           <i v-bind:class="mmc.faIconClass(file)"></i>
+        </div>
+      </template>
+
+      <template v-else>
+        <div class="icon">
+          <i class="fas fa-frown"></i>
         </div>
       </template>
 
@@ -84,7 +90,7 @@ export default {
     },
     abortUpload(file) {
       file.abort();
-      this.mmc.uploads.splice(this.mmc.uploads.indexOf(file), 1);
+      this.mmc.removeUpload(file);
     }
   }
 };
@@ -253,6 +259,15 @@ $actionsRadius: 5px;
     h3 {
       color: #fff;
     }
+  }
+}
+
+.file.interrupted {
+  .file-preview {
+    background-color: rgba(255,0,0, 0.3);
+  }
+  .file-title {
+    background-color: rgba(100, 0, 0);
   }
 }
 </style>
