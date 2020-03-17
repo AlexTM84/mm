@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+const CancelToken = axios.CancelToken;
+
 export default class Api {
 
   static get defaultOptions() {
@@ -33,14 +35,22 @@ export default class Api {
 
   upload(data, config, uploadFile) {
     var conf = this.computeConfig(config);
+    var source = CancelToken.source();
     var options = {
-      config: conf,
+      config: {
+        ...conf,
+        cancelToken: source.token
+      },
       url: this.options.uploadUrl
     };
     let configured = Promise.resolve();
     if (this.options.beforeUpload instanceof Function) {
       configured = Promise.all([this.options.beforeUpload(options, data, uploadFile)]).then(a => a[0]);
     }
+
+    uploadFile.abort = () => {
+      source.cancel();
+    };
 
     return configured.then(() => {
       return this.axios.post(options.url, data, options.config).then(res => {
@@ -96,5 +106,4 @@ export default class Api {
   createFolderUrl(parentFolder, name) {
     return this.options.createFolderUrl && this.options.createFolderUrl + (parentFolder ? '/' + parentFolder : "") + '/' + name;
   }
-
 }

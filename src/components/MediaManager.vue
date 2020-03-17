@@ -4,32 +4,7 @@
     v-bind:class="{ 'mm-fixed-height': options.height }"
     v-bind:style="options.height ? 'height:'+options.height : ''"
   >
-    <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-      <details-widget v-if="showDetails" v-bind:file="file" ref="details" key="details"></details-widget>
-    </transition>
-
-    <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-      <upload-status-widget
-        v-if="showUploadStatus"
-        v-bind:uploads="uploads"
-        ref="details"
-        key="details"
-      ></upload-status-widget>
-    </transition>
-
     <div class="panel panel-default">
-      <!--<div class="panel-heading">-->
-      <!--    <div class="btn-group btn-group-xs">-->
-      <!--    <button v-on:click="toggleUpload" class="btn btn-default">-->
-      <!--        <i class="fa fa-upload" aria-hidden="true"></i>-->
-      <!--    </button>-->
-      <!--    <button class="btn btn-default">-->
-      <!--        <i class="fa fa-plus-circle" aria-hidden="true"></i>-->
-      <!--        <i class="fa fa-folder-open" aria-hidden="true"></i>-->
-      <!--    </button>-->
-      <!--    </div>-->
-      <!--</div>-->
-
       <div class="panel-body">
         <notification-widget></notification-widget>
 
@@ -43,7 +18,6 @@
           <upload-widget
             v-if="api.options.uploadUrl"
             v-bind:path="path"
-            v-show="showUpload"
             v-on:upload-success="onUploadSuccess"
             v-on:upload-error="onUploadError"
             ref="upload"
@@ -52,8 +26,8 @@
           ></upload-widget>
 
           <medias-widget
-            v-bind:path="path"
-            v-show="showMedias"
+            :path="path"
+            :uploads="uploadsInPath"
             ref="medias"
             key="medias"
             class="animated fadeIn"
@@ -68,9 +42,7 @@
 import { mapState } from "vuex";
 
 import UploadWidget from "./UploadWidget.vue";
-import UploadStatusWidget from "./UploadStatusWidget.vue";
 import MediasWidget from "./MediasWidget.vue";
-import DetailsWidget from "./DetailsWidget.vue";
 import NotificationWidget from "./NotificationWidget.vue";
 import FaIconClassHelper from "../FaIconClassHelper";
 
@@ -79,8 +51,6 @@ export default {
   components: {
     MediasWidget,
     UploadWidget,
-    UploadStatusWidget,
-    DetailsWidget,
     NotificationWidget
   },
   data() {
@@ -89,11 +59,7 @@ export default {
         this.$store.state.options.initialPath ||
         this.$store.state.options.basePath,
       uploads: [],
-      file: {},
-      showUpload: true,
-      showUploadStatus: false,
-      showMedias: true,
-      showDetails: false
+      file: {}
     };
   },
   computed: {
@@ -124,21 +90,20 @@ export default {
       }
 
       return breadcrumb;
+    },
+    uploadsInPath() {
+      return this.uploads.filter(item => {
+        return item.path == this.path;
+      });
     }
   },
   created() {},
   methods: {
     onUploadSuccess() {
-      this.hideUploadStatus();
       this.$refs.medias.refresh();
     },
     onUploadError(errors) {
-      this.hideUploadStatus();
       this.$refs.medias.refresh();
-    },
-    onDetailsClose() {
-      this.showDetails = false;
-      this.file = {};
     },
     selectFile(file) {
       this.$store.commit("addSelected", file);
@@ -186,22 +151,32 @@ export default {
       if (this.options.api.renameUrl) {
         if (this.options.askNewName instanceof Function) {
           name = this.options.askNewName(file);
-        } else if (!(name = (window.prompt("Type the new name for " + file.basename, file.basename) || "").trim())) {
+        } else if (
+          !(name = (
+            window.prompt(
+              "Type the new name for " + file.basename,
+              file.basename
+            ) || ""
+          ).trim())
+        ) {
           name = Promise.reject();
         }
       }
       return Promise.all([name]).then(([name]) => {
-        if(name !== file.basename) {
-          return this.api.rename(file, name).then(response => {
-            let newFile = response.data;
-            this.$store.commit("renameSelected", { file, newFile} );
-            this.$refs.medias.$emit("fileRenamed", file, newFile);
-          }, e => {
-            if (this.options.onError instanceof Function) {
-              this.options.onError(e, "rename", file, name);
+        if (name !== file.basename) {
+          return this.api.rename(file, name).then(
+            response => {
+              let newFile = response.data;
+              this.$store.commit("renameSelected", { file, newFile });
+              this.$refs.medias.$emit("fileRenamed", file, newFile);
+            },
+            e => {
+              if (this.options.onError instanceof Function) {
+                this.options.onError(e, "rename", file, name);
+              }
+              return Promise.reject(e);
             }
-            return Promise.reject(e);
-          });
+          );
         } else {
           return Promise.reject();
         }
@@ -219,34 +194,6 @@ export default {
       return Promise.all([name]).then(([name]) => {
         return this.api.createFolderIn(parentFolder, name);
       });
-    },
-    toggleUploadStatusOn() {
-      if (this.hideUploadStatusTimeout)
-        window.clearTimeout(this.hideUploadStatusTimeout);
-      this.showUploadStatus = true;
-    },
-    toggleUploadStatusOff() {
-      if (this.hideUploadStatusTimeout)
-        window.clearTimeout(this.hideUploadStatusTimeout);
-      this.showUploadStatus = false;
-    },
-    hideUploadStatus() {
-      this.hideUploadStatusTimeout = window.setTimeout(
-        this.toggleUploadStatusOff,
-        5000
-      );
-    },
-    toggleUpload() {
-      this.showUpload = !this.showUpload;
-      this.showMedias = !this.showUpload;
-    },
-    toggleDetailsOn(file) {
-      this.file = file;
-      this.showDetails = true;
-    },
-    toggleDetailsOff() {
-      this.file = {};
-      this.showDetails = false;
     },
     checkFile(file) {
       if (!this.options.accept) {

@@ -61,8 +61,7 @@ export default {
     },
     methods: {
         onClose() {
-            if (this.completed)
-                this.mmc.toggleUploadStatusOff();
+            
         },
         uploadPercent(upload) {
             return Math.round(upload.loaded / upload.total * 100);

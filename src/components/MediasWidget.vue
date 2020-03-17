@@ -56,6 +56,14 @@
                         v-bind:class="{ invalid: file.type !== 'dir' && !mmc.checkFile(file) }"
                     ></media-widget>
 
+                    <media-widget
+                        v-for="upload in uploads"
+                        v-on:click.native="onMediaClick(upload)"
+                        v-bind:file="upload"
+                        v-bind:key="upload.path"
+                        class="animated fadeIn"
+                    ></media-widget>
+
                 </template>
             </div>
 
@@ -86,7 +94,9 @@ import { mapState } from 'vuex';
 import MediaWidget from './MediaWidget.vue';
 
 export default {
-    components: { MediaWidget },
+    components: {
+        MediaWidget
+    },
     data() {
         return {
             files: [],
@@ -98,7 +108,10 @@ export default {
             showContextMenu: false
         };
     },
-    props: [ 'path' ],
+    props: [
+        'path',
+        'uploads'
+    ],
     computed: {
         ...mapState({
             basePath: state => state.options.basePath
