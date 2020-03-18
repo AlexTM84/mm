@@ -29,6 +29,9 @@ export default class Store {
         selected: selected
       },
       mutations: {
+        setPath(state, path) {
+          state.path = options.basePath + path;
+        },
         resetSelected(state) {
           state.selected = null;
         },
@@ -55,7 +58,9 @@ export default class Store {
               state.selected.splice(index, 1);
             }
           } else {
-            state.selected = null;
+            if(state.seleted && ((file.uuid && state.selected.uuid === file.uuid) || (file.path && state.selected.path === file.path))) {
+              state.selected = null;
+            }
           }
           state.selected = JSON.parse(JSON.stringify(state.selected));
           state.mm.onSelect({ selected: state.selected });
@@ -107,9 +112,43 @@ export default class Store {
           if (renamed) {
             state.mm.onSelect({ selected: state.selected });
           }
+        },
+        fileUploaded(state, file) {
+          function cleanFile(f) {
+            delete f.uploading;
+            delete f.loaded;
+            delete f.total;
+            delete f.success;
+            delete f.error;
+            delete f.uploadPath;
+            delete f.uuid;
+            delete f.abort;
+          }
+
+          if (state.options.multipleSelection) {
+            if (!Array.isArray(state.selected)) return;
+            let selectedItem = state.selected.find(i => i.uuid === file.uuid);
+            if (selectedItem) {
+              Object.assign(selectedItem, file);
+              Object.assign(file, selectedItem);
+              cleanFile(selectedItem);
+              cleanFile(file);
+            }
+          } else {
+            if (state.selected && state.selected.uuid === file.uuid) {
+              state.selected = file;
+              cleanFile(file);
+            }
+          }
         }
       },
       getters: {
+        path: (state) => {
+          return state.path;
+        },
+        selected: (state, getters) => () => {
+          return state.selected;
+        },
         isSelected: (state, getters) => (file) => {
           if (state.options.multipleSelection) {
             if (!Array.isArray(state.selected)) return false;

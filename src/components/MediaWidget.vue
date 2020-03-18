@@ -267,7 +267,7 @@ $actionsRadius: 5px;
     background-color: rgba(255,0,0, 0.3);
   }
   .file-title {
-    background-color: rgba(100, 0, 0);
+    background-color: rgb(100, 0, 0);
   }
 }
 </style>

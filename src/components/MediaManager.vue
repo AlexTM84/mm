@@ -104,6 +104,13 @@ export default {
     unselectFile(file) {
       this.$store.commit("removeSelected", file);
     },
+    fileUploaded(file) {
+      const selected = this.isSelected(file);
+      this.$store.commit("fileUploaded", file);
+      if(selected && this.options.onSelect instanceof Function) {
+        this.options.onSelect({ selected: this.$store.getters.selected() });
+      }
+    },
     isSelected(file) {
       return this.$store.getters.isSelected(file);
     },

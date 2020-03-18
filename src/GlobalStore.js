@@ -53,6 +53,10 @@ export default new Vuex.Store({
     },
     uploading: (state, getters) => (dirPath) => {
       return state.uploading.filter(f => f.uploadPath === dirPath);
+    },
+    donePromise: (state, getters) => (file) => {
+      let upload = state.uploading.find(f => (file.path && f.path === file.path) || (file.uuid && f.uuid === file.uuid));
+      return upload && upload.promise || Promise.reject();
     }
   },
   actions: {

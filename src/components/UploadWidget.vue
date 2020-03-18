@@ -131,7 +131,6 @@ export default {
           error: false,
           uploadPath: this.path
         };
-        this.mmc.startUpload(upload);
         if (file.type) {
           requests.push(this.buildRequest(file, upload));
         } else {
@@ -172,8 +171,7 @@ export default {
       let formData = new FormData();
       formData.append("path", this.path);
       formData.append("file", file);
-
-      return this.api
+      upload.promise = this.api
         .upload(
           formData,
           {
@@ -189,6 +187,7 @@ export default {
         .then(
           response => {
             // Remove it
+            this.mmc.fileUploaded(upload);
             this.mmc.updateUpload(upload, {
               success: true
             });
@@ -216,6 +215,8 @@ export default {
             return Promise.reject({ file, error: message });
           }
         );
+      this.mmc.startUpload(upload);
+      return upload.promise;
     }
   }
 };
