@@ -101,7 +101,7 @@ export default {
   mounted() {
     this.parent.$on('setpath', path => {
       this.path = path;
-      this.$refs.medias.refresh();
+      this.$refs.medias && this.$refs.medias.refresh();
     });
   },
   methods: {
