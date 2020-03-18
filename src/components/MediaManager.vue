@@ -49,7 +49,7 @@ import FaIconClassHelper from "../FaIconClassHelper";
 import globalStore from "../GlobalStore";
 
 export default {
-  props: ["api", "id"],
+  props: ["api", "id", "parent"],
   components: {
     MediasWidget,
     UploadWidget,
@@ -96,7 +96,14 @@ export default {
       return globalStore.getters.uploading(this.path);
     }
   },
-  created() {},
+  created() {
+  },
+  mounted() {
+    this.parent.$on('setpath', path => {
+      this.path = path;
+      this.$refs.medias.refresh();
+    });
+  },
   methods: {
     selectFile(file) {
       this.$store.commit("addSelected", file);

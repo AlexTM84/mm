@@ -36,8 +36,6 @@ const defaultOptions = {
   accept: ""
 };
 
-let mm;
-
 export default {
   components: { MediaManager },
   props: ["id", "opts"],
@@ -117,6 +115,7 @@ export default {
     },
     setPath(path) {
       this.store$.commit("setPath", path);
+      this.$emit('setpath', path);
     },
     globalStore() {
       return globalStore;
@@ -138,7 +137,8 @@ export default {
         h(MediaManager, {
           props: {
             id: this.id,
-            api: this.api
+            api: this.api,
+            parent: this
           }
         })
     });
